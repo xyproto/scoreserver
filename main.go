@@ -6,11 +6,10 @@ import (
 
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/auth"
-	"github.com/martini-contrib/render"
 	"github.com/martini-contrib/binding"
+	"github.com/martini-contrib/render"
 	"github.com/xyproto/fizz"
 	"github.com/xyproto/instapage"
-
 )
 
 const (
@@ -51,12 +50,12 @@ func main() {
 		// If an admin user, ask for login
 		// If logged in as admin user, list users (admin panel from ftls2)
 		if !userstate.HasUser("admin") {
-			w.Header().Add("Content-Type", "text/html")
+			w.Header().Add("Content-Type", "text/html; charset=utf-8")
 			fmt.Fprint(w, instapage.RegisterForm())
 			return
 		}
 		if !userstate.AdminRights(req) {
-			w.Header().Add("Content-Type", "text/html")
+			w.Header().Add("Content-Type", "text/html; charset=utf-8")
 			fmt.Fprint(w, instapage.LoginForm())
 			return
 		}
@@ -64,7 +63,7 @@ func main() {
 	})
 
 	// Register the admin username and password
-	m.Post("/login", binding.Bind(UsernamePassword{}), func (up UsernamePassword) string {
+	m.Post("/login", binding.Bind(UsernamePassword{}), func(up UsernamePassword) string {
 		return "logging in " + up.Username + ":" + up.Password
 	})
 
@@ -84,7 +83,7 @@ func main() {
 	})
 
 	// For adding users
-	m.Post(API + "create/:username/:password", func(params martini.Params, r render.Render) {
+	m.Post(API+"create/:username/:password", func(params martini.Params, r render.Render) {
 		username := params["username"]
 		password := params["password"]
 		if userstate.HasUser(username) {
@@ -100,7 +99,7 @@ func main() {
 	})
 
 	// For logging in
-	m.Post(API + "login/:username/:password", func(w http.ResponseWriter, params martini.Params, r render.Render) {
+	m.Post(API+"login/:username/:password", func(w http.ResponseWriter, params martini.Params, r render.Render) {
 		username := params["username"]
 		password := params["password"]
 		if userstate.CorrectPassword(username, password) {
@@ -114,7 +113,7 @@ func main() {
 	})
 
 	// For logging out
-	m.Any(API + "logout/:username", func(params martini.Params, r render.Render) {
+	m.Any(API+"logout/:username", func(params martini.Params, r render.Render) {
 		username := params["username"]
 		userstate.Logout(username)
 		if userstate.IsLoggedIn(username) {
@@ -125,7 +124,7 @@ func main() {
 	})
 
 	// For login status
-	m.Post(API + "status/:username", func(params martini.Params, r render.Render) {
+	m.Post(API+"status/:username", func(params martini.Params, r render.Render) {
 		username := params["username"]
 		if userstate.IsLoggedIn(username) {
 			r.JSON(200, map[string]interface{}{"login": true})
@@ -135,7 +134,7 @@ func main() {
 	})
 
 	// Score POST og GET + timestamp
-	m.Post(API + "score/:username/:score", func(params martini.Params, r render.Render) {
+	m.Post(API+"score/:username/:score", func(params martini.Params, r render.Render) {
 		username := params["username"]
 		score := params["score"]
 
@@ -149,7 +148,7 @@ func main() {
 
 		r.JSON(200, map[string]interface{}{"score set": true})
 	})
-	m.Get(API + "score/:username", func(params martini.Params, r render.Render) {
+	m.Get(API+"score/:username", func(params martini.Params, r render.Render) {
 		username := params["username"]
 
 		if !userstate.HasUser(username) {

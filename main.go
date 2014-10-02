@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/go-martini/martini"
-	"github.com/martini-contrib/auth"
 	"github.com/martini-contrib/binding"
 	"github.com/martini-contrib/render"
+	"github.com/xyproto/auth"
 	"github.com/xyproto/fizz"
 	"github.com/xyproto/instapage"
 )
@@ -268,7 +268,7 @@ func main() {
 	m.Use(auth.BasicFunc(func(username, password string) bool {
 		// Check if the admin user has the correct password, as registered for the admin user
 		return auth.SecureCompare(AdminUsername, username) && userstate.CorrectPassword(AdminUsername, password)
-	}))
+	}, "/api"))
 
 	m.Run() // port 3000 by default
 }

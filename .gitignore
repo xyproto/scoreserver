@@ -25,5 +25,7 @@ _testmain.go
 
 .nfs*
 
+# Binaries
 api
+scoreserver
 highscoreserver

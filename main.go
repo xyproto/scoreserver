@@ -15,7 +15,7 @@ import (
 const (
 	Version       = "1.0"
 	API           = "/api/" + Version + "/"
-	Title         = "Highscore Server " + Version
+	Title         = "Score Server " + Version
 	AdminUsername = "admin"
 )
 

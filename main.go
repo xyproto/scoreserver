@@ -104,10 +104,11 @@ func main() {
 		r.HTML(http.StatusOK, "index", data)
 	})
 
-	m.Get("/remove", func() string {
-		userstate.RemoveUser(AdminUsername)
-		return "removed admin user"
-	})
+	// Enable temporarily for removing and re-creating the admin user with a new pasword
+	//m.Get("/remove", func() string {
+	//	userstate.RemoveUser(AdminUsername)
+	//	return "removed admin user"
+	//})
 
 	// --- Admin user management ---
 

@@ -67,6 +67,7 @@ func main() {
 	})
 
 	// Admin status
+	// TODO Consider adding a bool2yesno function and use fmt.Sprintf instead
 	m.Any("/status", func(r render.Render) {
 		s := "has administrator: "
 		if userstate.HasUser(AdminUsername) {
@@ -264,8 +265,7 @@ func main() {
 	// Share the files in static
 	m.Use(martini.Static("static"))
 
-	// TODO: Find a way to allow some paths to not use BASIC AUTH and/or use an environment variable
-	// HTTP Basic Auth
+	// Only enable HTTP Basic Auth for paths that starts with "/api"
 	m.Use(auth.BasicFunc(func(username, password string) bool {
 		// Check if the admin user has the correct password, as registered for the admin user
 		return auth.SecureCompare(AdminUsername, username) && userstate.CorrectPassword(AdminUsername, password)

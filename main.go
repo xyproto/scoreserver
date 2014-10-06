@@ -175,14 +175,30 @@ func main() {
 	})
 
 	// For adding users
-	m.Post(API+"create/:username/:password", func(params martini.Params, r render.Render) {
+
+	m.Post(API+"create/:username", func(params martini.Params, r render.Render) {
 		username := params["username"]
-		password := params["password"]
 		if userstate.HasUser(username) {
 			r.JSON(http.StatusConflict, map[string]interface{}{"error": "user " + username + " already exists"})
 			return
 		}
-		userstate.AddUser(username, password, "")
+		userstate.AddUser(username, "", "")
+		if userstate.HasUser(username) {
+			r.JSON(http.StatusOK, map[string]interface{}{"create": true})
+		} else {
+			r.JSON(http.StatusInternalServerError, map[string]interface{}{"error": "user " + username + " was not created"})
+		}
+	})
+
+	m.Post(API+"register/:username/:password/:email", func(params martini.Params, r render.Render) {
+		username := params["username"]
+		password := params["password"]
+		password := params["email"]
+		if userstate.HasUser(username) {
+			r.JSON(http.StatusConflict, map[string]interface{}{"error": "user " + username + " already exists"})
+			return
+		}
+		userstate.AddUser(username, password, email)
 		if userstate.HasUser(username) {
 			r.JSON(http.StatusOK, map[string]interface{}{"create": true})
 		} else {

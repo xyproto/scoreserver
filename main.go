@@ -193,7 +193,7 @@ func main() {
 	m.Post(API+"register/:username/:password/:email", func(params martini.Params, r render.Render) {
 		username := params["username"]
 		password := params["password"]
-		password := params["email"]
+		email := params["email"]
 		if userstate.HasUser(username) {
 			r.JSON(http.StatusConflict, map[string]interface{}{"error": "user " + username + " already exists"})
 			return

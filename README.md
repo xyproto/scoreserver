@@ -10,11 +10,16 @@ Technologies involved
 ---------------------
 
 * Server programming language: [go](https://golang.org)
-* Webserver for http/https, and proxy for server apps: [nginx](https://nginx.org)
 * Authentication: [HTTP Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication)
-* Encryption: [HTTP over TLS/SSL](http://en.wikipedia.org/wiki/HTTP_Secure)
 * Database backend: [Redis](http://redis.io/)
 * API style: [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) and [JSON](http://en.wikipedia.org/wiki/JSON)
+
+
+Suggestions for additional technologies 
+---------------------------------------
+
+* Webserver for http/https, and proxy for server apps: [nginx](https://nginx.org)
+* Encryption: [HTTP over TLS/SSL](http://en.wikipedia.org/wiki/HTTP_Secure)
 
 
 Requirements
@@ -97,3 +102,10 @@ Port
 ----
 
 Set the HOST and PORT environment variables for running the server on a different host/port. This is handled by the [martini](http://martini.codegangsta.io) package.
+
+
+General information
+-------------------
+
+* Author: Alexander Rødseth, 2014
+* License: MIT

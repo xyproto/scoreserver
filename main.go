@@ -47,15 +47,9 @@ func main() {
 	r := render.Renderer(render.Options{})
 	m.Use(r)
 
-	// Initiate the user and permission system
+	// Initiate the user system
 	fizz := fizz.NewWithRedisConf(7, "")
 	userstate := fizz.UserState()
-
-	// Permission system
-	//perm := fizz.Perm()
-
-	// Authorization is provided by http basic auth.
-	//perm.Clear()
 
 	// --- Public pages and admin panel ---
 
@@ -170,9 +164,6 @@ func main() {
 
 	// --- REST methods ---
 
-	// The API uses HTTP Basic Auth instead of cookies
-	//perm.AddPublicPath(API)
-
 	// For testing the API
 	m.Any(API, func(r render.Render) {
 		r.JSON(http.StatusOK, map[string]interface{}{"hello": "fjaselus"})
@@ -279,9 +270,6 @@ func main() {
 		r.JSON(http.StatusOK, map[string]interface{}{"score": score})
 	})
 
-	// Activate the permission middleware
-	//m.Use(fizz.All())
-
 	// Share the files in static
 	m.Use(martini.Static("static"))
 
@@ -291,5 +279,6 @@ func main() {
 		return auth.SecureCompare(AdminUsername, username) && userstate.CorrectPassword(AdminUsername, password)
 	}, "/api"))
 
-	m.Run() // port 3000 by default
+	// port 3000 by default, uses PORT and HOST environment variables
+	m.Run()
 }

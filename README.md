@@ -26,7 +26,7 @@ Requirements
 ------------
 
 * redis and go (the package is often named "golang")
-* Remember to use HTTPS when using HTTP Basic Auth!
+* Use HTTPS whenever using HTTP Basic Auth
 
 
 Terms used
@@ -69,7 +69,6 @@ Admin user management
 TODO
 ----
 
-* Only the administrator should be allowed to log out.
 * Administration panel
   * For changing the username for the administrator
   * For changing the password for the administrator

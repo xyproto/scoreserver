@@ -1,9 +1,8 @@
 #!/bin/sh
-export PORT=8080
+export PORT=3007
 export HOST=
 SOURCE=
 for f in *.go; do
- # ../onthefly/*.go ../genericsite/*.go ../instapage/*.go ../simpleredis/*.go ../siteengines/*.go ../moskus/*.go ../webhandle/*.go; do
   SOURCE+="$f "
 done
 BIN=scoreserver
@@ -33,7 +32,7 @@ while true; do
     clear
     date
     echo
-    echo -n 'Recompiling Score server...'
+    echo -n 'Recompiling Scoreserver...'
     [ -e $LOG ] && rm $LOG
     go build -o $BIN > $LOG
     if [ "$(wc -c $LOG | cut -d' ' -f1)" == '0' ]; then

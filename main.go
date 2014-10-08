@@ -54,7 +54,7 @@ func main() {
 	// Permission system
 	//perm := fizz.Perm()
 
-	// Authorization is proviced by http basic auth.
+	// Authorization is provided by http basic auth.
 	//perm.Clear()
 
 	// --- Public pages and admin panel ---

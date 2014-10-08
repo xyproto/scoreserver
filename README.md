@@ -66,14 +66,6 @@ Admin user management
 * HTTP ANY **/logout**
   * For logging out the administrator.
 
-TODO
-----
-
-* Administration panel
-  * For changing the username for the administrator
-  * For changing the password for the administrator
-  * For listing and managing registered users
-
 
 API calls
 ---------
@@ -103,6 +95,15 @@ The following calls requires authentication with HTTP Basic Auth, where the user
 
 * HTTP GET **/api/1.0/score/:username**
   * Return the score for a given username.
+
+
+TODO
+----
+
+* Administration panel
+  * For changing the username for the administrator
+  * For changing the password for the administrator
+  * For listing and managing registered users
 
 
 Port

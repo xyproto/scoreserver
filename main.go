@@ -29,6 +29,14 @@ type LoginAdmin struct {
 	Password string `form:"password" binding:"required"`
 }
 
+// Helper function for converting a bool to "yes" or "no"
+func b2yn(yesno bool) string {
+	if yesno {
+		return "yes"
+	}
+	return "no"
+}
+
 func main() {
 	fmt.Println(Title)
 
@@ -67,21 +75,11 @@ func main() {
 	})
 
 	// Admin status
-	// TODO Consider adding a bool2yesno function and use fmt.Sprintf instead
 	m.Any("/status", func(r render.Render) {
-		s := "has administrator: "
-		if userstate.HasUser(AdminUsername) {
-			s += "yes"
-		} else {
-			s += "no"
-		}
-		s += ", "
-		s += "logged in: "
-		if userstate.IsLoggedIn(AdminUsername) {
-			s += "yes"
-		} else {
-			s += "no"
-		}
+		s := fmt.Sprintf("has administrator: %s, logged in: %s",
+			b2yn(userstate.HasUser(AdminUsername)),
+			b2yn(userstate.IsLoggedIn(AdminUsername)),
+		)
 
 		data := map[string]string{
 			"title": Title,
@@ -94,7 +92,7 @@ func main() {
 
 	// The admin panel
 	m.Get("/admin", func(w http.ResponseWriter, req *http.Request, r render.Render) {
-		// TODO: Write a nice admin panel, for managing users, like in ftls2
+		// TODO: Write an admin panel for managing users
 
 		data := map[string]string{
 			"title": Title,
@@ -115,14 +113,14 @@ func main() {
 
 	// Register the admin password
 	m.Get("/register", func(w http.ResponseWriter, req *http.Request) {
-		// TODO: Handle things differently if a regular user is logged in
-		if !userstate.HasUser(AdminUsername) {
-			w.Header().Add("Content-Type", "text/html")
-			fmt.Fprint(w, "<!doctype html><html><body>")
-			fmt.Fprint(w, instapage.RegisterForm())
-			fmt.Fprint(w, "</body></html>")
+		if userstate.HasUser(AdminUsername) {
+			fmt.Fprint(w, "Error: Already has a registered administrator.")
 			return
 		}
+		w.Header().Add("Content-Type", "text/html")
+		fmt.Fprint(w, "<!doctype html><html><body>")
+		fmt.Fprint(w, instapage.RegisterForm())
+		fmt.Fprint(w, "</body></html>")
 	})
 	m.Post("/register", binding.Bind(RegisterAdmin{}), func(ra RegisterAdmin) string {
 		username := AdminUsername
@@ -130,38 +128,44 @@ func main() {
 			userstate.AddUser(username, ra.Password1, ra.Email)
 			userstate.SetAdminStatus(username)
 		}
-		return "registered " + username
+		return "Success: Registered administrator: " + username + "."
 	})
 
 	// Login admin
 	m.Get("/login", func(w http.ResponseWriter, req *http.Request) {
-		// TODO: Handle things differently if a regular user is logged in
-		if !userstate.AdminRights(req) {
-			w.Header().Add("Content-Type", "text/html")
-			fmt.Fprint(w, "<!doctype html><html><body>")
-			fmt.Fprint(w, instapage.LoginForm())
-			fmt.Fprint(w, "</body></html>")
+		if userstate.AdminRights(req) || userstate.UserRights(req) {
+			fmt.Fprint(w, "Error: Already logged in as a user or as an administrator.")
 			return
 		}
+		w.Header().Add("Content-Type", "text/html")
+		fmt.Fprint(w, "<!doctype html><html><body>")
+		fmt.Fprint(w, instapage.LoginForm())
+		fmt.Fprint(w, "</body></html>")
 	})
 	m.Post("/login", binding.Bind(LoginAdmin{}), func(la LoginAdmin) string {
 		username := AdminUsername
 		if !userstate.HasUser(username) {
-			return "FAIL must have " + username
+			return "Error: User " + username + " does not exist."
 		}
 		if !userstate.CorrectPassword(username, la.Password) {
-			return "FAIL password"
+			return "Error: Incorrect password."
 		}
 		userstate.SetLoggedIn(username)
-		return "logged in " + username
+		return "Success: Logged in " + username + "."
 	})
 
 	// Logout admin
-	m.Any("/logout", func() string {
+	m.Any("/logout", func(req *http.Request) string {
 		username := AdminUsername
+		if !userstate.AdminRights(req) {
+			return "Error: Need administrator rights to log out the administrator user."
+		}
 		userstate.Logout(username)
-		// TODO errorcheck
-		return "logged out " + username
+		if userstate.IsLoggedIn(username) {
+			// logout failed
+			return "Error: Could not log out."
+		}
+		return "Success: Logged out " + username + "."
 	})
 
 	// --- REST methods ---

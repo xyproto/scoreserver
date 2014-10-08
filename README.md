@@ -6,13 +6,15 @@ Scoreserver
 REST/JSON server for managing users and scores
 
 
-Technologies involved
----------------------
+Overview
+--------
 
 * Server programming language: [go](https://golang.org)
-* Authentication: [HTTP Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication)
 * Database backend: [Redis](http://redis.io/)
 * API style: [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) and [JSON](http://en.wikipedia.org/wiki/JSON)
+* Web framework: [martini](http://martini.codegangsta.io)
+* Middleware: [binding](https://github.com/martini-contrib/binding), [render](https://github.com/martini-contrib/render), [auth](https://github.com/xyproto/auth) and [fizz](https://github.com/xyproto/fizz)
+* Instant forms: [instapage](https://github.com/xyproto/instapage)
 
 
 Suggestions for additional technologies 

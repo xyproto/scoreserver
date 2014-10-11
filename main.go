@@ -136,7 +136,7 @@ func main() {
 		fmt.Fprint(w, instapage.LoginForm())
 		fmt.Fprint(w, "</body></html>")
 	})
-	m.Post("/login", binding.Bind(LoginAdmin{}), func(la LoginAdmin) string {
+	m.Post("/login", binding.Bind(LoginAdmin{}), func(la LoginAdmin, w http.ResponseWriter, req *http.Request) string {
 		username := AdminUsername
 		if !userstate.HasUser(username) {
 			return "Error: User " + username + " does not exist."
@@ -144,7 +144,10 @@ func main() {
 		if !userstate.CorrectPassword(username, la.Password) {
 			return "Error: Incorrect password."
 		}
-		userstate.SetLoggedIn(username)
+		userstate.Login(w, username)
+		if !userstate.AdminRights(req) {
+			return "Error: User " + username + " was logged in, but does not have admin rights. Cookie problem?"
+		}
 		return "Success: Logged in " + username + "."
 	})
 
@@ -157,7 +160,7 @@ func main() {
 		userstate.Logout(username)
 		if userstate.IsLoggedIn(username) {
 			// logout failed
-			return "Error: Could not log out."
+			return "Error: Could not log out " + username + "."
 		}
 		return "Success: Logged out " + username + "."
 	})

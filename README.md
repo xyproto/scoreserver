@@ -99,6 +99,13 @@ The following calls requires authentication with HTTP Basic Auth, where the user
   * Return the score for a given username.
 
 
+Social Network API calls
+------------------------
+
+* HTTP ANY **/api/1.0/fb/friends/:userAccessToken**
+  * Return the number of friends for a given user
+
+
 TODO
 ----
 

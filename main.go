@@ -283,7 +283,7 @@ func main() {
 			r.JSON(http.StatusInternalServerError, map[string]interface{}{"error": "could not fetch friends from facebook: " + err.Error()})
 			return
 		} else {
-			r.JSON(http.StatusOK, map[string]interface{}{"login": friends})
+			r.JSON(http.StatusOK, map[string]interface{}{"friends": friends})
 		}
 	})
 

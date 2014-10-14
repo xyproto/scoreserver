@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	fb "github.com/huandu/facebook"
 )
 
@@ -18,7 +20,7 @@ func facebookFriends(userAccessToken string) (string, error) {
 	// validate access token. err is nil if token is valid.
 	err := session.Validate()
 	if err != nil {
-		return err, -1
+		return "", err
 	}
 
 	// use session to send api request with your access token.
@@ -26,5 +28,12 @@ func facebookFriends(userAccessToken string) (string, error) {
 
 	friends := res.Get("summary")
 
-	return friends
+	friendCountMap := friends.(map[string]interface{})
+
+	friendCount, ok := friendCountMap["total_count"]
+	if !ok {
+		return "", errors.New("could not find total_count in result from fb")
+	}
+
+	return fmt.Sprintf("%v", friendCount), nil
 }

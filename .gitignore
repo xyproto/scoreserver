@@ -32,3 +32,5 @@ highscoreserver
 main
 
 *.pyc
+
+errors.err

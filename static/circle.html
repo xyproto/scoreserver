@@ -1,0 +1,103 @@
+<html>
+  <head>
+    <title>Looming Visual Stimuli</title>
+    <style>
+* { margin:0; padding:0; } /* to remove the top and left whitespace */
+html, body { width:100%; height:100%; } /* just to be sure these are full screen*/
+canvas { display:block; } /* To remove the scrollbars */
+    </style>
+    <script src="js/jquery-2.1.1.min.js"></script>
+  </head>
+  <body>
+  <canvas id="c"></canvas>
+  <script>
+
+  var counter = 0;
+  var intervalID = 0;
+  var running = false;
+
+  function clearCircle() {
+    var canvas = document.getElementById('c');
+    var ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function changeCircle() {    
+    if (!running) return;
+
+    var canvas = document.getElementById('c');
+    var ctx = canvas.getContext('2d');
+
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    var centerX = canvas.width / 2;
+    var centerY = canvas.height / 2;
+    var radius = counter;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+    ctx.fillStyle = 'black';
+    ctx.fill();
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = '#003300';
+    ctx.stroke();
+
+    counter += 2
+    if (counter >= 300) {
+      counter = 0;
+    }
+  }
+
+  function startLoom() {
+    var canvas = document.getElementById('c');
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    return setInterval(changeCircle, 10);
+  }
+
+  function listenForTrigger() {
+    $.ajax({
+      url: "https://api.roboticoverlords.org/trigger/get",
+      type: "GET",
+      dataType: "json",
+      timeout: 1000, // one second
+      success: function(data) {
+        if (data.trigger == true) {
+          // try again, after 1 second
+          //setTimeout(listenForTrigger, 1000);
+          // start the circle, if not running
+          if (!running) {
+            running = true;
+            intervalID = startLoom();
+          }
+        } else {
+          // stop the circle
+          if (running) {
+            running = false;
+            clearInterval(intervalID);
+            clearCircle();
+          }
+          // try again, after 1 second
+          //setTimeout(listenForTrigger, 1000);
+        }
+      },
+      error: function(x, t, m) {
+          if(t==="timeout") {
+              alert("got timeout");
+          } else {
+              alert(t);
+          }
+      }
+    });
+  }      
+
+  setInterval(listenForTrigger, 1000);
+  //listenForTrigger();
+
+  </script>
+  </body>
+</html>

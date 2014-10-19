@@ -68,6 +68,8 @@ func main() {
 		r.HTML(http.StatusOK, "index", data)
 	})
 
+	setupTrigger(m, r)
+
 	// Admin status
 	m.Any("/status", func(r render.Render) {
 		s := fmt.Sprintf("has administrator: %s, logged in: %s",

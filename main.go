@@ -68,6 +68,7 @@ func main() {
 		r.HTML(http.StatusOK, "index", data)
 	})
 
+	// AJAX / server state test
 	setupTrigger(m, r)
 
 	// Admin status

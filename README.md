@@ -77,6 +77,10 @@ The following calls requires authentication with HTTP Basic Auth, where the user
 * HTTP ANY **/api/1.0/**
   * Returns the JSON data: {"hello": "fjaselus"} as a test.
 
+
+User related API calls
+----------------------
+
 * HTTP POST **/api/1.0/create/:username**
   * Create a new user, with empty password and email.
 
@@ -91,6 +95,10 @@ The following calls requires authentication with HTTP Basic Auth, where the user
 
 * HTTP ANY **/api/1.0/status/:username**
   * Show the login status for a given username.
+
+
+Score related API calls
+-----------------------
 
 * HTTP POST **/api/1.0/score/:username/:score**
   * Set a score for a given username.
@@ -114,6 +122,24 @@ Social Network API calls
 * HTTP GET **/api/1.0/insta/friends/:username**
   * Return the number of instagram friends for a given user (must be registered)
 
+
+AJAX-related API calls, for testing one server state for several clients
+------------------------------------------------------------------------
+
+* **/circle.html**
+  * Page that displays an expanding circle, if the trigger is set
+
+* **/trigger**
+  * Show the trigger status in a template
+
+* HTTP GET **/trigger/get**
+  * Get the status of the trigger (true or false)
+
+* HTTP GET **/trigger/set**
+  * Set the trigger to true
+
+* HTTP GET **/trigger/clear**
+  * Set the trigger to false
 
 
 TODO

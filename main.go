@@ -277,17 +277,7 @@ func main() {
 
 	// --- Social network function ---
 
-	// Number of friends on Facebook
-	m.Any(API+"fb/friends/:userAccessToken", func(params martini.Params, r render.Render) {
-		userAccessToken := params["userAccessToken"]
-		friends, err := facebookFriends(userAccessToken)
-		if err != nil {
-			r.JSON(http.StatusInternalServerError, map[string]interface{}{"error": "could not fetch friends from facebook: " + err.Error()})
-			return
-		} else {
-			r.JSON(http.StatusOK, map[string]interface{}{"friends": friends})
-		}
-	})
+	setupFB(m, r)
 
 	// Share the files in static
 	m.Use(martini.Static("static"))

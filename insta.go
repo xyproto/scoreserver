@@ -20,10 +20,9 @@ const (
 
 func setupInsta(m *martini.ClassicMartini, r martini.Handler, userstate *permissions.UserState) {
 
-	// Store access token for a given user
-	m.Post(API+"insta/reg/:username/:userID/:token", func(params martini.Params, r render.Render) {
+	// Store access token for a given user (token includes userID)
+	m.Post(API+"insta/reg/:username/:token", func(params martini.Params, r render.Render) {
 		username := params["username"]
-		userID := params["userID"]
 		token := params["token"]
 
 		if !userstate.HasUser(username) {
@@ -32,10 +31,9 @@ func setupInsta(m *martini.ClassicMartini, r martini.Handler, userstate *permiss
 		}
 
 		users := userstate.GetUsers()
-		users.Set(username, instaIDName, userID)
 		users.Set(username, instaTokenName, token)
 
-		r.JSON(http.StatusOK, map[string]interface{}{"user id and access token set": true})
+		r.JSON(http.StatusOK, map[string]interface{}{"user access token set": true})
 	})
 
 	// Number of friends on Instagram
@@ -49,17 +47,18 @@ func setupInsta(m *martini.ClassicMartini, r martini.Handler, userstate *permiss
 
 		users := userstate.GetUsers()
 
-		userID, err := users.Get(username, instaIDName)
-		if err != nil {
-			r.JSON(http.StatusInternalServerError, map[string]interface{}{"error": "could not get insta user id for " + username})
-			return
-		}
-
 		userAccessToken, err := users.Get(username, instaTokenName)
 		if err != nil {
 			r.JSON(http.StatusInternalServerError, map[string]interface{}{"error": "could not get insta user access token for " + username})
 			return
 		}
+
+		if !strings.Contains(userAccessToken, ".") {
+			r.JSON(http.StatusInternalServerError, map[string]interface{}{"error": "user access token must contain a . for separating user ID and access token"})
+			return
+		}
+		fields := strings.Split(userAccessToken, ".")
+		userID := fields[0]
 
 		friends, err := instaFriends(userID, userAccessToken)
 		if err != nil {

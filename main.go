@@ -277,7 +277,11 @@ func main() {
 
 	// --- Social network function ---
 
+	// Facebook friends
 	setupFB(m, r)
+
+	// Instagra friends
+	setupInsta(m, r)
 
 	// Share the files in static
 	m.Use(martini.Static("static"))

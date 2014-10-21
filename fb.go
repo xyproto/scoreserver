@@ -20,7 +20,8 @@ const (
 func setupFB(m *martini.ClassicMartini, r martini.Handler, userstate *permissions.UserState) {
 
 	// Store access token for a given user
-	m.Post(API+"fb/reg/:username/:token", func(params martini.Params, r render.Render) {
+	//m.Post(API+"fb/reg/:username/:token", func(params martini.Params, r render.Render) {
+	m.Any(API+"fb/reg/:username/:token", func(params martini.Params, r render.Render) {
 		username := params["username"]
 		token := params["token"]
 

@@ -21,7 +21,8 @@ const (
 func setupInsta(m *martini.ClassicMartini, r martini.Handler, userstate *permissions.UserState) {
 
 	// Store access token for a given user (token includes userID)
-	m.Post(API+"insta/reg/:username/:token", func(params martini.Params, r render.Render) {
+	m.Any(API+"insta/reg/:username/:token", func(params martini.Params, r render.Render) {
+	//m.Post(API+"insta/reg/:username/:token", func(params martini.Params, r render.Render) {
 		username := params["username"]
 		token := params["token"]
 

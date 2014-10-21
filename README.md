@@ -123,8 +123,10 @@ Social Network API calls
   * Return the number of instagram friends for a given user (must be registered)
 
 
-AJAX-related API calls, for testing one server state for several clients
-------------------------------------------------------------------------
+AJAX-related API calls
+----------------------
+
+For testing one server state for several clients. Just a test.
 
 * **/circle.html**
   * Page that displays an expanding circle, if the trigger is set

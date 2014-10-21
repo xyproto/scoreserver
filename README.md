@@ -105,6 +105,9 @@ Social Network API calls
 * HTTP ANY **/api/1.0/fb/friends/:userAccessToken**
   * Return the number of friends for a given user
 
+* HTTP POST **/api/1.0/fb/reg/:username/:userAccessToken**
+  * Store a facebook user access token for a given user
+
 
 TODO
 ----

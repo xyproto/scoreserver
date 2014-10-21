@@ -278,7 +278,7 @@ func main() {
 	// --- Social network function ---
 
 	// Facebook friends
-	setupFB(m, r)
+	setupFB(m, r, userstate)
 
 	// Instagra friends
 	setupInsta(m, r)

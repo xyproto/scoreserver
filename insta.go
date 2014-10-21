@@ -8,17 +8,60 @@ import (
 	"fmt"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
+	"github.com/xyproto/permissions"
 	"net/http"
 	"strings"
 )
 
-func setupInsta(m *martini.ClassicMartini, r martini.Handler) {
+const (
+	instaTokenName = "insta_user_access_token"
+	instaIDName    = "insta_user_id"
+)
+
+func setupInsta(m *martini.ClassicMartini, r martini.Handler, userstate *permissions.UserState) {
+
+	// Store access token for a given user
+	m.Post(API+"insta/reg/:username/:userID/:token", func(params martini.Params, r render.Render) {
+		username := params["username"]
+		userID := params["userID"]
+		token := params["token"]
+
+		if !userstate.HasUser(username) {
+			r.JSON(http.StatusNotFound, map[string]interface{}{"error": "no such user " + username})
+			return
+		}
+
+		users := userstate.GetUsers()
+		users.Set(username, instaIDName, userID)
+		users.Set(username, instaTokenName, token)
+
+		r.JSON(http.StatusOK, map[string]interface{}{"user id and access token set": true})
+	})
 
 	// Number of friends on Instagram
-	m.Any(API+"insta/friends/:userID/:accessToken", func(params martini.Params, r render.Render) {
-		userID := params["userID"]
-		accessToken := params["accessToken"]
-		friends, err := instaFriends(userID, accessToken)
+	m.Get(API+"insta/friends/:username", func(params martini.Params, r render.Render) {
+		username := params["username"]
+
+		if !userstate.HasUser(username) {
+			r.JSON(http.StatusNotFound, map[string]interface{}{"error": "no such user " + username})
+			return
+		}
+
+		users := userstate.GetUsers()
+
+		userID, err := users.Get(username, instaIDName)
+		if err != nil {
+			r.JSON(http.StatusInternalServerError, map[string]interface{}{"error": "could not get insta user id for " + username})
+			return
+		}
+
+		userAccessToken, err := users.Get(username, instaTokenName)
+		if err != nil {
+			r.JSON(http.StatusInternalServerError, map[string]interface{}{"error": "could not get insta user access token for " + username})
+			return
+		}
+
+		friends, err := instaFriends(userID, userAccessToken)
 		if err != nil {
 			r.JSON(http.StatusInternalServerError, map[string]interface{}{"error": "could not fetch friends from instagram: " + err.Error()})
 			return
@@ -26,6 +69,7 @@ func setupInsta(m *martini.ClassicMartini, r martini.Handler) {
 			r.JSON(http.StatusOK, map[string]interface{}{"friends": friends})
 		}
 	})
+
 }
 
 func instaFriends(userID, accessToken string) (string, error) {

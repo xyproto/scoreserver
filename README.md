@@ -102,11 +102,18 @@ The following calls requires authentication with HTTP Basic Auth, where the user
 Social Network API calls
 ------------------------
 
-* HTTP ANY **/api/1.0/fb/friends/:userAccessToken**
-  * Return the number of friends for a given user
-
 * HTTP POST **/api/1.0/fb/reg/:username/:userAccessToken**
   * Store a facebook user access token for a given user
+
+* HTTP GET **/api/1.0/fb/friends/:username**
+  * Return the number of facebook friends for a given user (must be registered)
+
+* HTTP POST **/api/1.0/insta/reg/:username/:userID/:userAccessToken**
+  * Store a instagram user ID and access token for a given user
+
+* HTTP GET **/api/1.0/insta/friends/:username**
+  * Return the number of instagram friends for a given user (must be registered)
+
 
 
 TODO

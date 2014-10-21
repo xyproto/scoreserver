@@ -281,7 +281,7 @@ func main() {
 	setupFB(m, r, userstate)
 
 	// Instagra friends
-	setupInsta(m, r)
+	setupInsta(m, r, userstate)
 
 	// Share the files in static
 	m.Use(martini.Static("static"))

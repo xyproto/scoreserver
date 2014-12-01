@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
-	"github.com/xyproto/permissions"
+	"github.com/xyproto/permissions2"
 	"net/http"
 	"strings"
 )
@@ -31,7 +31,7 @@ func setupInsta(m *martini.ClassicMartini, r martini.Handler, userstate *permiss
 			return
 		}
 
-		users := userstate.GetUsers()
+		users := userstate.Users()
 		users.Set(username, instaTokenName, token)
 
 		r.JSON(http.StatusOK, map[string]interface{}{"user access token set": true})
@@ -46,7 +46,7 @@ func setupInsta(m *martini.ClassicMartini, r martini.Handler, userstate *permiss
 			return
 		}
 
-		users := userstate.GetUsers()
+		users := userstate.Users()
 
 		userAccessToken, err := users.Get(username, instaTokenName)
 		if err != nil {

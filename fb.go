@@ -6,7 +6,7 @@ import (
 	"github.com/go-martini/martini"
 	fb "github.com/huandu/facebook"
 	"github.com/martini-contrib/render"
-	"github.com/xyproto/permissions"
+	"github.com/xyproto/permissions2"
 	"net/http"
 )
 
@@ -30,7 +30,7 @@ func setupFB(m *martini.ClassicMartini, r martini.Handler, userstate *permission
 			return
 		}
 
-		users := userstate.GetUsers()
+		users := userstate.Users()
 		users.Set(username, fbTokenName, token)
 
 		r.JSON(http.StatusOK, map[string]interface{}{"user id and access token set": true})
@@ -45,7 +45,7 @@ func setupFB(m *martini.ClassicMartini, r martini.Handler, userstate *permission
 			return
 		}
 
-		users := userstate.GetUsers()
+		users := userstate.Users()
 
 		userAccessToken, err := users.Get(username, fbTokenName)
 		if err != nil {

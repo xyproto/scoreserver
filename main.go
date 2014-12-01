@@ -8,8 +8,8 @@ import (
 	"github.com/martini-contrib/binding"
 	"github.com/martini-contrib/render"
 	"github.com/xyproto/auth"
-	"github.com/xyproto/fizz"
 	"github.com/xyproto/instapage"
+	"github.com/xyproto/permissions2"
 )
 
 const (
@@ -48,8 +48,8 @@ func main() {
 	m.Use(r)
 
 	// Initiate the user system
-	fizz := fizz.NewWithRedisConf(7, "")
-	userstate := fizz.UserState()
+	perm := permissions.NewWithRedisConf(7, "")
+	userstate := perm.UserState()
 
 	// --- Public pages and admin panel ---
 
@@ -253,7 +253,7 @@ func main() {
 			return
 		}
 
-		users := userstate.GetUsers()
+		users := userstate.Users()
 		users.Set(username, "score", score)
 
 		r.JSON(http.StatusOK, map[string]interface{}{"score set": true})
@@ -266,7 +266,7 @@ func main() {
 			return
 		}
 
-		users := userstate.GetUsers()
+		users := userstate.Users()
 		score, err := users.Get(username, "score")
 		if err != nil {
 			r.JSON(http.StatusInternalServerError, map[string]interface{}{"error": "could not get score for " + username})

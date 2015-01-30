@@ -3,7 +3,7 @@ Scoreserver
 
 [![Build Status](https://travis-ci.org/xyproto/scoreserver.svg?branch=master)](https://travis-ci.org/xyproto/scoreserver)
 
-REST/JSON server for managing users and scores
+REST/JSON server for managing users and scores.
 
 
 Overview
@@ -13,7 +13,7 @@ Overview
 * Database backend: [Redis](http://redis.io/)
 * API style: [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) and [JSON](http://en.wikipedia.org/wiki/JSON)
 * Web framework: [martini](http://martini.codegangsta.io)
-* Middleware: [binding](https://github.com/martini-contrib/binding), [render](https://github.com/martini-contrib/render), [auth](https://github.com/xyproto/auth) and [permissions2](https://github.com/xyproto/permissions2).
+* Middleware: [binding](https://github.com/martini-contrib/binding), [render](https://github.com/martini-contrib/render), [auth](https://github.com/xyproto/auth) and [permissions2](https://github.com/xyproto/permissions2)
 * Instant forms: [instapage](https://github.com/xyproto/instapage)
 
 
@@ -162,5 +162,6 @@ Set the HOST and PORT environment variables for running the server on a differen
 General information
 -------------------
 
-* Author: Alexander Rødseth, 2014
+* Version: 0.1
+* Author: Alexander F Rødseth, 2015
 * License: MIT

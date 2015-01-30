@@ -288,7 +288,7 @@ func main() {
 	m.Use(martini.Static("static"))
 
 	// Only enable HTTP Basic Auth for paths that starts with "/api"
-	m.Use(auth.BasicFunc(func(username, password string) bool {
+	m.Use(auth.BasicFuncPrefix(func(username, password string) bool {
 		// Check if the admin user has the correct password, as registered for the admin user
 		return auth.SecureCompare(AdminUsername, username) && userstate.CorrectPassword(AdminUsername, password)
 	}, "/api"))

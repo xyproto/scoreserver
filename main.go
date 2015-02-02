@@ -1,3 +1,4 @@
+// REST/JSON server for managing users and scores.
 package main
 
 import (

@@ -14,8 +14,8 @@ import (
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/binding"
 	"github.com/martini-contrib/render"
-	"github.com/xyproto/instapage"
 	"github.com/xyproto/permissions2"
+	"github.com/xyproto/webhandle"
 )
 
 const (
@@ -222,7 +222,7 @@ func main() {
 		}
 		w.Header().Add("Content-Type", "text/html")
 		fmt.Fprint(w, "<!doctype html><html><body>")
-		fmt.Fprint(w, instapage.RegisterForm())
+		fmt.Fprint(w, webhandle.RegisterForm())
 		fmt.Fprint(w, "</body></html>")
 	})
 	m.Post("/register", binding.Bind(RegisterAdmin{}), func(ra RegisterAdmin) string {
@@ -242,7 +242,7 @@ func main() {
 		}
 		w.Header().Add("Content-Type", "text/html")
 		fmt.Fprint(w, "<!doctype html><html><body>")
-		fmt.Fprint(w, instapage.LoginForm())
+		fmt.Fprint(w, webhandle.LoginForm())
 		fmt.Fprint(w, "</body></html>")
 	})
 	m.Post("/login", binding.Bind(LoginAdmin{}), func(la LoginAdmin, w http.ResponseWriter, req *http.Request) string {

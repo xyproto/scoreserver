@@ -6,9 +6,9 @@ import (
 	"net/http"
 
 	"github.com/go-martini/martini"
+	"github.com/martini-contrib/auth"
 	"github.com/martini-contrib/binding"
 	"github.com/martini-contrib/render"
-	"github.com/xyproto/auth"
 	"github.com/xyproto/instapage"
 	"github.com/xyproto/permissions2"
 )
@@ -102,10 +102,10 @@ func main() {
 	})
 
 	// Enable temporarily for removing and re-creating the admin user with a new pasword
-	//m.Get("/remove", func() string {
-	//	userstate.RemoveUser(AdminUsername)
-	//	return "removed admin user"
-	//})
+	m.Get("/remove", func() string {
+		userstate.RemoveUser(AdminUsername)
+		return "removed admin user"
+	})
 
 	// --- Admin user management ---
 
@@ -277,22 +277,26 @@ func main() {
 		r.JSON(http.StatusOK, map[string]interface{}{"score": score})
 	})
 
+	// Share the files in static
+	m.Use(martini.Static("static"))
+
 	// --- Social network function ---
 
 	// Facebook friends
 	setupFB(m, r, userstate)
 
-	// Instagra friends
+	// Instagram friends
 	setupInsta(m, r, userstate)
 
-	// Share the files in static
-	m.Use(martini.Static("static"))
+	// --- HTTP Basic Auth ---
 
 	// Only enable HTTP Basic Auth for paths that starts with "/api"
-	m.Use(auth.BasicFuncPrefix(func(username, password string) bool {
-		// Check if the admin user has the correct password, as registered for the admin user
-		return auth.SecureCompare(AdminUsername, username) && userstate.CorrectPassword(AdminUsername, password)
-	}, "/api"))
+	authRoutes := []string{"/api"}
+	for _, route := range authRoutes {
+		m.Any(route, auth.BasicFunc(func(username, password string) bool {
+			return auth.SecureCompare(AdminUsername, username) && userstate.CorrectPassword(AdminUsername, password)
+		}))
+	}
 
 	// port 3000 by default, uses PORT and HOST environment variables
 	m.Run()

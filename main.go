@@ -38,12 +38,11 @@ type LoginAdmin struct {
 	Password string `form:"password" binding:"required"`
 }
 
+var yesnomap = map[bool]string{true: "yes", false: "no"}
+
 // Helper function for converting a bool to "yes" or "no"
-func b2yn(yesno bool) string {
-	if yesno {
-		return "yes"
-	}
-	return "no"
+func b2yn(b bool) string {
+	return yesnomap[b]
 }
 
 // Retrieve the username and password given in the HTTP Authorization header
@@ -112,10 +111,17 @@ func MartiniBasicAuthWithPathPrefixes(userstate *permissions.UserState, pathPref
 					HTTPBasicAuthRejectPrompt(w)
 					return
 				}
+				// Check if the username is empty
+				if username == "" {
+					// Empty username
+					HTTPBasicAuthRejectPrompt(w)
+					return
+				}
 				// Check if the user is the administrator user, if onlyAdmin is toggled on
 				if onlyAdmin && !SecureCompare(AdminUsername, username) {
 					// Reject and return
 					HTTPBasicAuthRejectPrompt(w)
+					return
 				}
 				// Check if the username exists
 				if !userstate.HasUser(username) {
@@ -150,6 +156,10 @@ func main() {
 	// Initiate the user system
 	perm := permissions.NewWithRedisConf(7, "")
 	userstate := perm.UserState()
+
+	// Protect the API url prefix with HTTP Basic Auth.
+	// Only the admin user is allowed to access the API.
+	m.Use(MartiniBasicAuthWithPathPrefixes(userstate, []string{API}, true))
 
 	// --- Public pages and admin panel ---
 
@@ -373,10 +383,6 @@ func main() {
 
 	// Share the files in static
 	m.Use(martini.Static("static"))
-
-	// Protect the API url prefix with HTTP Basic Auth.
-	// Only the admin user is allowed to access the API.
-	m.Use(MartiniBasicAuthWithPathPrefixes(userstate, []string{API}, true))
 
 	// --- Social network function ---
 

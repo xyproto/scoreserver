@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <title>{{.title}}</title>
+  <link rel="shortcut icon" href="favicon.ico">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,300' rel='stylesheet' type='text/css'>
+ <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <style>
+    body {
+      margin: 5em;
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      background: #202020;
+    }
+    a {
+      text-decoration: none;
+      color: #a0a0a0;
+      font-size: 1.5em;
+    }
+    a:hover {
+      color: gray;
+    }
+    div#lbl {
+      position: absolute;
+      left: 20%;
+      color: #e9e9e9;
+      font-size: 3em;
+      text-align: left;
+      font-weight: 300;
+    }
+    p {
+      font-weight: 400;
+      font-size: 0.7em;
+    }
+  </style>
+</head>
+<body>
+  <div id="lbl">
+    {{.title}}
+    <p><font style="color: #80ffa0">Has Administrator user: </font>{{.admin}}</p>
+    <p><font style="color: #80ffa0">Current HTTP Basic Auth username: </font>{{.basicusername}}</p>
+    <p><font style="color: #80ffa0">Administrator is logged in on the server: </font>{{.serverloggedin}}</p>
+  </div>
+</body>
+</html>

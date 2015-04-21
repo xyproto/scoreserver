@@ -2,11 +2,16 @@
 package main
 
 import (
+	"crypto/sha256"
+	"crypto/subtle"
+	"encoding/base64"
+	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/go-martini/martini"
-	"github.com/martini-contrib/auth"
 	"github.com/martini-contrib/binding"
 	"github.com/martini-contrib/render"
 	"github.com/xyproto/instapage"
@@ -14,9 +19,12 @@ import (
 )
 
 const (
-	Version       = "1.0"
-	API           = "/api/" + Version + "/"
-	Title         = "Score Server " + Version
+	Version = "1.0"
+	API     = "/api/" + Version + "/"
+	Title   = "Score Server " + Version
+)
+
+var (
 	AdminUsername = "admin"
 )
 
@@ -36,6 +44,97 @@ func b2yn(yesno bool) string {
 		return "yes"
 	}
 	return "no"
+}
+
+// Retrieve the username and password given in the HTTP Authorization header
+func HTTPBasicAuthUsernamePassword(r *http.Request) (string, string, error) {
+	auth := r.Header.Get("Authorization")
+	if len(auth) < 6 || auth[:6] != "Basic " {
+		return "", "", errors.New("HTTP Basic Auth: Invalid header: " + auth)
+	}
+	b, err := base64.StdEncoding.DecodeString(auth[6:])
+	if err != nil {
+		return "", "", err
+	}
+	tokens := strings.SplitN(string(b), ":", 2)
+	if len(tokens) != 2 {
+		return "", "", errors.New("HTTP Basic Auth: Invalid number of tokens: " + strconv.Itoa(len(tokens)))
+	}
+	// Return the given username and password
+	return tokens[0], tokens[1], nil
+}
+
+// Return the HTTP Basic Auth username or an empty string.
+func HTTPBasicAuthUsername(r *http.Request) string {
+	// Return the username if there are no errors
+	if username, _, err := HTTPBasicAuthUsernamePassword(r); err == nil {
+		return username
+	}
+	// For all other cases, return an empty string
+	return ""
+}
+
+// Ask the user for a username and password, by using HTTP Basic Auth, setting a header and
+// rejecting the current HTTP request. "Authorization Required" will be used as the realm.
+func HTTPBasicAuthRejectPrompt(w http.ResponseWriter) {
+	w.Header().Set("WWW-Authenticate", `Basic realm="Authorization Required"`)
+	http.Error(w, "Not Authorized", http.StatusUnauthorized)
+}
+
+// Ask the user for a username and password, by using HTTP Basic Auth, setting a header and
+// rejecting the current HTTP request. The given realm will be used as the realm. The
+// realm is often shown in the dialog box that asks for a username and password, and can be
+// used to identify a website or a collection of websites.
+func HTTPBasicAuthRejectPromptWithRealm(w http.ResponseWriter, realm string) {
+	w.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
+	http.Error(w, "Not Authorized", http.StatusUnauthorized)
+}
+
+// SecureCompare performs a constant time compare of two strings to limit timing attacks.
+// From https://github.com/martini-contrib/auth/blob/master/util.go
+func SecureCompare(given string, actual string) bool {
+	givenSha := sha256.Sum256([]byte(given))
+	actualSha := sha256.Sum256([]byte(actual))
+	return subtle.ConstantTimeCompare(givenSha[:], actualSha[:]) == 1
+}
+
+// For some URL path prefixes, check if the user has the right username on password with HTTP Basic Auth (when already registered on the server).
+// This is completely unsecure over unencrypted HTTP, but is secure over HTTPS.
+// This function can be used as Martini middleware. If onlyAdmin is enabled, only the administrator user will be allowed for the given prefixes.
+func MartiniBasicAuthWithPathPrefixes(userstate *permissions.UserState, pathPrefixes []string, onlyAdmin bool) martini.Handler {
+	return func(w http.ResponseWriter, r *http.Request, c martini.Context) {
+		for _, pathPrefix := range pathPrefixes {
+			if strings.HasPrefix(r.URL.Path, pathPrefix) {
+				// Protected by HTTP Basic Auth
+				username, password, err := HTTPBasicAuthUsernamePassword(r)
+				if err != nil {
+					// There was an error retrieving the username and password, reject and return
+					HTTPBasicAuthRejectPrompt(w)
+					return
+				}
+				// Check if the user is the administrator user, if onlyAdmin is toggled on
+				if onlyAdmin && !SecureCompare(AdminUsername, username) {
+					// Reject and return
+					HTTPBasicAuthRejectPrompt(w)
+				}
+				// Check if the username exists
+				if !userstate.HasUser(username) {
+					// Reject and return
+					HTTPBasicAuthRejectPrompt(w)
+					return
+				}
+				// Check if the password is correct
+				if !userstate.CorrectPassword(username, password) {
+					// Reject and return
+					HTTPBasicAuthRejectPrompt(w)
+					return
+				}
+				// Ok
+			}
+		}
+		// Go on
+		c.Next()
+	}
 }
 
 func main() {
@@ -73,19 +172,15 @@ func main() {
 	setupTrigger(m, r)
 
 	// Admin status
-	m.Any("/status", func(r render.Render) {
-		s := fmt.Sprintf("has administrator: %s, logged in: %s",
-			b2yn(userstate.HasUser(AdminUsername)),
-			b2yn(userstate.IsLoggedIn(AdminUsername)),
-		)
-
+	m.Any("/status", func(req *http.Request, r render.Render) {
 		data := map[string]string{
-			"title": Title,
-			"msg":   s,
+			"title":          Title,
+			"admin":          b2yn(userstate.HasUser(AdminUsername)),
+			"serverloggedin": b2yn(userstate.IsLoggedIn(AdminUsername)),
+			"basicusername":  HTTPBasicAuthUsername(req),
 		}
-
-		// Uses templates/index.tmpl
-		r.HTML(http.StatusOK, "index", data)
+		// Uses templates/status.tmpl
+		r.HTML(http.StatusOK, "status", data)
 	})
 
 	// The admin panel
@@ -101,11 +196,11 @@ func main() {
 		r.HTML(http.StatusOK, "index", data)
 	})
 
-	// Enable temporarily for removing and re-creating the admin user with a new pasword
-	m.Get("/remove", func() string {
-		userstate.RemoveUser(AdminUsername)
-		return "removed admin user"
-	})
+	// Enable temporarily for removing and re-creating the admin user with a new password
+	//m.Get("/remove", func() string {
+	//	userstate.RemoveUser(AdminUsername)
+	//	return "removed admin user"
+	//})
 
 	// --- Admin user management ---
 
@@ -214,7 +309,6 @@ func main() {
 		password := params["password"]
 		if userstate.CorrectPassword(username, password) {
 			userstate.SetLoggedIn(username)
-
 		}
 		if !userstate.IsLoggedIn(username) {
 			r.JSON(http.StatusUnauthorized, map[string]interface{}{"error": "could not log in " + username})
@@ -280,6 +374,10 @@ func main() {
 	// Share the files in static
 	m.Use(martini.Static("static"))
 
+	// Protect the API url prefix with HTTP Basic Auth.
+	// Only the admin user is allowed to access the API.
+	m.Use(MartiniBasicAuthWithPathPrefixes(userstate, []string{API}, true))
+
 	// --- Social network function ---
 
 	// Facebook friends
@@ -287,16 +385,6 @@ func main() {
 
 	// Instagram friends
 	setupInsta(m, r, userstate)
-
-	// --- HTTP Basic Auth ---
-
-	// Only enable HTTP Basic Auth for paths that starts with "/api"
-	authRoutes := []string{"/api"}
-	for _, route := range authRoutes {
-		m.Any(route, auth.BasicFunc(func(username, password string) bool {
-			return auth.SecureCompare(AdminUsername, username) && userstate.CorrectPassword(AdminUsername, password)
-		}))
-	}
 
 	// port 3000 by default, uses PORT and HOST environment variables
 	m.Run()

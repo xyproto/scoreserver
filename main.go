@@ -173,7 +173,7 @@ func main() {
 
 	// For testing the API
 	m.Any(API, func(r render.Render) {
-		r.JSON(http.StatusOK, map[string]interface{}{"hello": "fjaselus"})
+		r.JSON(http.StatusOK, map[string]interface{}{"all systems": "go"})
 	})
 
 	// For adding users

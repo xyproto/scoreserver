@@ -75,7 +75,7 @@ API calls
 The following calls requires authentication with HTTP Basic Auth, where the username is 'admin' and the password is set when creating the admin user with the /register call above.
 
 * HTTP ANY **/api/1.0/**
-  * Returns the JSON data: {"hello": "fjaselus"} as a test.
+  * Returns the JSON data: {"all systems": "go"} as a test.
 
 
 User related API calls

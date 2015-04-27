@@ -14,6 +14,7 @@ import (
 )
 
 const (
+	// Your values goes here
 	instaTokenName = "insta_user_access_token"
 	instaIDName    = "insta_user_id"
 )

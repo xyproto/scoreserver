@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	appName        = "PonyBumpCommander"
-	appAccessToken = "1516006388643143|iQlhYN9N80RQnAOSXWNndB_oVos"
+	// Your values goes here
+	appName        = "fb_app_name"
+	appAccessToken = "fb_app_access_token"
 	fbTokenName    = "fb_user_access_token"
 	fbIDName       = "fb_user_id"
 )

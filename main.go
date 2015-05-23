@@ -15,6 +15,7 @@ import (
 	"github.com/martini-contrib/binding"
 	"github.com/martini-contrib/render"
 	"github.com/xyproto/permissions2"
+	"github.com/xyproto/pinterface"
 	"github.com/xyproto/webhandle"
 )
 
@@ -100,7 +101,7 @@ func SecureCompare(given string, actual string) bool {
 // For some URL path prefixes, check if the user has the right username on password with HTTP Basic Auth (when already registered on the server).
 // This is completely unsecure over unencrypted HTTP, but is secure over HTTPS.
 // This function can be used as Martini middleware. If onlyAdmin is enabled, only the administrator user will be allowed for the given prefixes.
-func MartiniBasicAuthWithPathPrefixes(userstate *permissions.UserState, pathPrefixes []string, onlyAdmin bool) martini.Handler {
+func MartiniBasicAuthWithPathPrefixes(userstate pinterface.IUserState, pathPrefixes []string, onlyAdmin bool) martini.Handler {
 	return func(w http.ResponseWriter, r *http.Request, c martini.Context) {
 		for _, pathPrefix := range pathPrefixes {
 			if strings.HasPrefix(r.URL.Path, pathPrefix) {

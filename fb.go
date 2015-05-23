@@ -6,7 +6,7 @@ import (
 	"github.com/go-martini/martini"
 	fb "github.com/huandu/facebook"
 	"github.com/martini-contrib/render"
-	"github.com/xyproto/permissions2"
+	"github.com/xyproto/pinterface"
 	"net/http"
 )
 
@@ -18,7 +18,7 @@ const (
 	fbIDName       = "fb_user_id"
 )
 
-func setupFB(m *martini.ClassicMartini, r martini.Handler, userstate *permissions.UserState) {
+func setupFB(m *martini.ClassicMartini, r martini.Handler, userstate pinterface.IUserState) {
 
 	// Store access token for a given user
 	//m.Post(API+"fb/reg/:username/:token", func(params martini.Params, r render.Render) {

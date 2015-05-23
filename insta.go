@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
-	"github.com/xyproto/permissions2"
+	"github.com/xyproto/pinterface"
 	"net/http"
 	"strings"
 )
@@ -19,7 +19,7 @@ const (
 	instaIDName    = "insta_user_id"
 )
 
-func setupInsta(m *martini.ClassicMartini, r martini.Handler, userstate *permissions.UserState) {
+func setupInsta(m *martini.ClassicMartini, r martini.Handler, userstate pinterface.IUserState) {
 
 	// Store access token for a given user (token includes userID)
 	m.Any(API+"insta/reg/:username/:token", func(params martini.Params, r render.Render) {
